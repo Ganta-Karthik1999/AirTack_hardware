@@ -2,7 +2,7 @@ import socket
 
 
 port = 5050
-server1 = "172.29.224.1"
+server1 = "172.19.32.1"
 header = 64
 format = 'utf-8'
 disconnet_msg = "!DISCONNECT"
