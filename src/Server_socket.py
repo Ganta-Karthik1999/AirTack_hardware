@@ -11,8 +11,19 @@ format = 'utf-8'
 disconnet_msg = "!DISCONNECT"
 # server = "192.168.20.1"
 
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # Doesn't have to be reachable
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+    finally:
+        s.close()
+    return ip
 
-server1 = socket.gethostbyname(socket.gethostname())
+
+
+server1 = get_local_ip()
 
 create_socket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -36,7 +47,7 @@ def handle_client_connection(conn,addr):
 
 def start():
     create_socket.listen()
-    print(f"[L ISTENING] Server is listening on {server1}:{port}")
+    print(f"[LISTENING] Server is listening on {server1}:{port}")
     while True:
         conn, addr = create_socket.accept()
         thread = threading.Thread(target=handle_client_connection, args=(conn, addr))
@@ -46,4 +57,6 @@ def start():
          
 print("server is starting...")
 start()
+
+
 

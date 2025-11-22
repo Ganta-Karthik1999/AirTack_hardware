@@ -1,8 +1,23 @@
 import socket
 
 
+
+
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # Doesn't have to be reachable
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+    finally:
+        s.close()
+    return ip
+
+
+
+server1 = get_local_ip()
+
 port = 5050
-server1 = "172.19.32.1"
 header = 64
 format = 'utf-8'
 disconnet_msg = "!DISCONNECT"
