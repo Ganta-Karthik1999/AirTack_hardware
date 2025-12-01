@@ -15,7 +15,7 @@ TM7711 tm7711(DATA_PIN, CLOCK_PIN);
 
 client wifiClient("Sagar home 5G", 
                   "Janfeb@12",
-                  "10.32.12.13",
+                  "10.110.210.23",
                     5050,
                     64
 );
@@ -46,15 +46,15 @@ void loop() {
     int pressurePercentage = tm7711.mapPressurePercentage(voltage);
 
     // Print results
-    Serial.print("Raw Value: ");
-    Serial.print(rawValue);
-    Serial.print(" | Voltage: ");
-    Serial.print(voltage, 3);
-    Serial.print(" V | Pressure: ");
-    Serial.print(pressure, 2);
-    Serial.print(" kPa | Pressure Percentage: ");
-    Serial.print(pressurePercentage);
-    Serial.println(" %");
+    // Serial.print("Raw Value: ");
+    // Serial.print(rawValue);
+    // Serial.print(" | Voltage: ");
+    // Serial.print(voltage, 3);
+    // Serial.print(" V | Pressure: ");
+    // Serial.print(pressure, 2);
+    // Serial.print(" kPa | Pressure Percentage: ");
+    // Serial.print(pressurePercentage);
+    // Serial.println(" %");
 
     if(pressure> 25){
 
@@ -67,7 +67,7 @@ void loop() {
         digitalWrite(BUZZER_PIN, LOW);// turning off the buzzer
 
     }
-    wifiClient.sendMessgae("Hello from ESP32\n");
+    // wifiClient.sendMessgae("Hello from ESP32\n");
 
     
 

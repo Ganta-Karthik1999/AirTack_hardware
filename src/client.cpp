@@ -40,7 +40,7 @@ void client::clientconnect()
 //   Serial.print("Connecting to server: ");
    Serial.println(server_ip);
 
-   if(espclient.connect(server_ip, server_port)==1){
+   if(espclient.connect(server_ip, server_port)){
     Serial.println("CONNECTED to server!");
    }
     else{
