@@ -11,8 +11,6 @@ def get_local_ip():
         s.close()
     return ip
 
-
-
 server1 = get_local_ip()
 
 port = 5050

@@ -1,189 +1,74 @@
-// #include<Arduino.h>
-// #include <WiFi.h>
-
-// const char* ssid = "Sagar home 5G";
-// const char* password = "Janfeb@12";
-
-// void setup() {
-//   Serial.begin(115200);
-//   delay(10);
-
-//   // We start by connecting to a WiFi network
-//   Serial.println();
-//   Serial.println();
-//   Serial.print("Connecting to ");
-//   Serial.println(ssid);
-
-//   WiFi.begin(ssid, password);
-
-//   while (WiFi.status() != WL_CONNECTED) {
-//     delay(500);
-//     Serial.print(".");
-//   }
-
-//   Serial.println("");
-//   Serial.println("WiFi connected");
-//   Serial.println("IP address: ");
-//   // Serial.println(WiFi.localIP());
-
-// }
-
-// void loop() {
-
-//     Serial.println(WiFi.localIP());
-//     delay(500);
-
-// }
-
-// #include <Arduino.h>
-// #include <WiFi.h>
-
-// // ------------- CHANGE THESE -------------
-// const char *ssid = "Sagar home 5G";
-// const char *password = "Janfeb@12";
-
-// // Your server (laptop/PC) IP address
-// const char *server_ip = "10.0.0.97"; // <-- CHANGE THIS!
-// const uint16_t server_port = 5050;
-// // ----------------------------------------
-
-// WiFiClient client;
-
-// void connectToWiFi()
-// {
-//   Serial.print("Connecting to WiFi");
-//   WiFi.begin(ssid, password);
-
-//   while (WiFi.status() != WL_CONNECTED)
-//   {
-//     Serial.print(".");
-//     delay(500);
-//   }
-
-//   Serial.println("\nWiFi Connected!");
-//   Serial.print("IP Address: ");
-//   Serial.println(WiFi.localIP());
-// }
-
-// void connectToServer()
-// {
-//   Serial.print("Connecting to server ");
-
-//   while (!client.connect(server_ip, server_port))
-//   {
-//     Serial.print(".");
-//     delay(500);
-//   }
-
-//   Serial.println("\nConnected to server!");
-// }
-
-// void setup()
-// {
-//   delay(3000); // Prevents upload issues on ESP32-C3
-//   Serial.begin(115200);
-
-//   connectToWiFi();
-//   connectToServer();
-// }
-
-// void loop()
-// {
-
-//   // Check if disconnected from server
-//   if (!client.connected())
-//   {
-//     Serial.println("Disconnected from server! Reconnecting...");
-//     client.stop();
-//     connectToServer();
-//   }
-
-//   // Send data
-//   client.println("Hello from ESP32-C3!");
-
-//   // Check for server response
-//   if (client.available())
-//   {
-//     String message = client.readStringUntil('\n');
-//     Serial.print("Server: ");
-//     Serial.println(message);
-//   }
-
-//   delay(1000);
-// }
-
 
 #include <Arduino.h>
+#include "TM7711.h"
+#include "client.h"
 #include <WiFi.h>
+// Pin definitions (GPIO)
+#define DATA_PIN  D4  // DOUT (data output) from TM7711
+#define CLOCK_PIN D5  // PD_SCK (clock input) to TM7711
+#define GREEN_LED D0 //  Green LED pin
+#define BUZZER_PIN D1 // Buzzer pin
 
-const char* ssid     = "Sagar home 5G";
-const char* password = "Janfeb@12";
+// Create TM7711  
+TM7711 tm7711(DATA_PIN, CLOCK_PIN);
 
-const char* server_ip = "10.178.205.13";   // your server
-const uint16_t server_port = 5050;
 
-WiFiClient client;
+client wifiClient("Sagar home 5G", 
+                  "Janfeb@12",
+                  "10.32.12.13",
+                    5050,
+                    64
+);
 
-const int HEADER_SIZE = 64;
 
-void sendMessage(String msg) {
-  // 1️⃣ Convert message length to a header string
-  String lengthStr = String(msg.length());
-  
-  // 2️⃣ Pad header to 64 bytes
-  while (lengthStr.length() < HEADER_SIZE) {
-    lengthStr += " ";
-  }
 
-  // 3️⃣ Send header
-  client.print(lengthStr);
-
-  // 4️⃣ Send actual message
-  client.print(msg);
-}
 
 void setup() {
-  Serial.begin(115200);
-  delay(3000);
-
-  // Connect to WiFi
-  Serial.print("Connecting to WiFi");
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(500);
-  }
-  Serial.println("\nWiFi connected!");
-
-  // Connect to server
-  Serial.print("Connecting to server: ");
-  Serial.println(server_ip);
-
-  if (client.connect(server_ip, server_port)) {
-    Serial.println("CONNECTED to server!");
-  } else {
-    Serial.println("FAILED to connect!");
-    return;
-  }
+    Serial.begin(115200);
+    tm7711.initialize(); // Initialize the TM7711
+    pinMode(GREEN_LED, OUTPUT); // Initialize the green LED pin as an output
+    pinMode(BUZZER_PIN, OUTPUT); // Initialize the buzzer pin as an output
+    wifiClient.wificonnect();
+    wifiClient.clientconnect();
 }
 
 void loop() {
-  if (!client.connected()) {
-    Serial.println("Disconnected from server. Reconnecting...");
-    client.connect(server_ip, server_port);
-    delay(1000);
-    return;
-  }
+    // Read average raw value
+    long rawValue = tm7711.readAverage(25);
 
-  // send message
-  sendMessage("Hello from ESP32-C3!");
+    // Convert raw value to voltage
+    float voltage = tm7711.convertToVoltage(rawValue);
 
-  // read server response
-  if (client.available()) {
-    String resp = client.readString();
-    Serial.print("Server: ");
-    Serial.println(resp);
-  }
+    // Convert voltage to pressure
+    float pressure = tm7711.convertToPressure(voltage);
 
-  delay(1000);
+    // Map pressure to percentage
+    int pressurePercentage = tm7711.mapPressurePercentage(voltage);
+
+    // Print results
+    Serial.print("Raw Value: ");
+    Serial.print(rawValue);
+    Serial.print(" | Voltage: ");
+    Serial.print(voltage, 3);
+    Serial.print(" V | Pressure: ");
+    Serial.print(pressure, 2);
+    Serial.print(" kPa | Pressure Percentage: ");
+    Serial.print(pressurePercentage);
+    Serial.println(" %");
+
+    if(pressure> 25){
+
+        digitalWrite(GREEN_LED, LOW); // Turn the LED on (HIGH is the voltage level)
+        digitalWrite(BUZZER_PIN, HIGH);// turning on the buzzer
+    }
+
+    else{
+        digitalWrite(GREEN_LED, HIGH); // Turn the LED off by making the voltage LOW
+        digitalWrite(BUZZER_PIN, LOW);// turning off the buzzer
+
+    }
+    wifiClient.sendMessgae("Hello from ESP32\n");
+
+    
+
 }
