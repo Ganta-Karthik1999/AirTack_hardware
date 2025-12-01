@@ -39,7 +39,8 @@ void client::clientconnect()
     
 //   Serial.print("Connecting to server: ");
    Serial.println(server_ip);
-
+   Serial.print(" on port: ");
+    Serial.println(server_port);
    if(espclient.connect(server_ip, server_port)){
     Serial.println("CONNECTED to server!");
    }
@@ -52,14 +53,15 @@ void client::clientconnect()
 }
 
 
-void client::sendMessgae(char *data)
+void client::sendMessgae(String data)
 {
     if(espclient.connected()){
-        String lengthStr = String(strlen(data));
+        String lengthStr = String(data.length());
         while (lengthStr.length() < header_size) {
         lengthStr += " ";
       }
         espclient.print(lengthStr);
+        espclient.print(data);
         Serial.println("Message sent to server:");
         Serial.println(data);
     }
@@ -67,3 +69,4 @@ void client::sendMessgae(char *data)
         Serial.println("Client not connected to server. Message not sent.");
     }
 }
+

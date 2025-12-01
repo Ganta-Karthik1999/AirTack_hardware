@@ -9,7 +9,7 @@ client(const char *_ssid, const char *_password, const char *server_ip, uint16_t
     void initialize();
     void wificonnect();
     void clientconnect();
-    void sendMessgae(char *data);
+    void sendMessgae(String data);
 
 private:
     const char *_ssid;
@@ -24,3 +24,4 @@ private:
 };
 
 #endif
+

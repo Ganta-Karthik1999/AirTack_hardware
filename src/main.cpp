@@ -15,7 +15,7 @@ TM7711 tm7711(DATA_PIN, CLOCK_PIN);
 
 client wifiClient("Sagar home 5G", 
                   "Janfeb@12",
-                  "10.110.210.23",
+                  "10.231.104.13",
                     5050,
                     64
 );
@@ -67,8 +67,10 @@ void loop() {
         digitalWrite(BUZZER_PIN, LOW);// turning off the buzzer
 
     }
-    // wifiClient.sendMessgae("Hello from ESP32\n");
 
+    // wifiClient.clientconnect();
+    wifiClient.sendMessgae("Hello from ESP32 !!");
+    delay(1000); // Wait for 1 second before the next reading
     
 
 }
