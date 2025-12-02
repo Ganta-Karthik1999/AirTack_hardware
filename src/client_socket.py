@@ -1,8 +1,6 @@
 import socket
 
 
-
-
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
@@ -12,8 +10,6 @@ def get_local_ip():
     finally:
         s.close()
     return ip
-
-
 
 server1 = get_local_ip()
 
