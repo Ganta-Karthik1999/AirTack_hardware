@@ -70,3 +70,11 @@ void client::sendMessgae(String data)
     }
 }
 
+void client::receiveMessage()
+{
+    if(espclient.available()){
+        String message = espclient.readString();
+        Serial.println("Message received from server:");
+        Serial.println(message);
+    }
+}

@@ -10,6 +10,7 @@ client(const char *_ssid, const char *_password, const char *server_ip, uint16_t
     void wificonnect();
     void clientconnect();
     void sendMessgae(String data);
+    void receiveMessage();
 
 private:
     const char *_ssid;
